@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorcado Jurídico: La Polis y el Mundo Helénico</title>
+    <!-- Google Fonts: Inter para un diseño limpio y moderno -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --danger: #f43f5e;
+            --success: #10b981;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .stats-bar span strong {
+            color: var(--accent-color);
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        canvas {
+            background: transparent;
+        }
+
+        .clue-box {
+            background: rgba(56, 189, 248, 0.05);
+            border-left: 4px solid var(--accent-color);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .word-display {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .letter-slot {
+            font-size: 1.5rem;
+            font-weight: 700;
+            width: 32px;
+            border-bottom: 3px solid var(--accent-color);
+            text-align: center;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .key-btn {
+            background-color: #334155;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .key-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        .key-btn:disabled {
+            background-color: #1e293b;
+            color: var(--border);
+            border: 1px solid var(--border);
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .modal-content p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        @media (max-width: 480px) {
+            .keyboard {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Las Ciudades Estado en Grecia</h1>
+        <p>Instituciones Políticas y Jurídicas de la Polis</p>
+    </header>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <span>Progreso: <strong id="current-word-idx">1</strong> / <strong id="total-words">15</strong></span>
+            <span>Errores permitidos: <strong id="lives">6</strong> / 6</span>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="hangmanCanvas" width="160" height="130"></canvas>
+        </div>
+
+        <div class="clue-box" id="clueText">
+            Cargando pista dogmática...
+        </div>
+
+        <div class="word-display" id="wordDisplay"></div>
+
+        <div class="keyboard" id="keyboard"></div>
+    </div>
+
+    <!-- Modal de Victoria / Derrota -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Resultado</h2>
+            <p id="modalMessage">Mensaje del sistema doctrinal.</p>
+            <button class="action-btn" id="modalBtn" onclick="nextStep()">Siguiente Término</button>
+        </div>
+    </div>
+
+   <script>
+        // Banco de palabras rigurosamente ligado al contenido de la cátedra
+        const lexicon = [
+            { word: "POLIS", clue: "Comunidad de ciudadanos autogobernada, soberana e independiente en la antigua Grecia." },
+            { word: "AUTARKEIA", clue: "Principio de autosuficiencia económica y militar exigido a la ciudad-estado." },
+            { word: "AUTONOMIA", clue: "Capacidad jurídica de la polis para regirse por sus propias leyes." },
+            { word: "POLITITES", clue: "Ciudadano con estatus privilegiado que participa activamente en el ejercicio del poder y la creación del derecho." },
+            { word: "NOMOS", clue: "Ordenamiento jurídico escrito y deliberado por la comunidad, pilar del positivismo primigenio." },
+            { word: "PHYSIS", clue: "Concepto natural frente al cual se debate la justicia y el ordenamiento normativo establecido." },
+            { word: "POLITEIA", clue: "Constitución o estructura orgánica, material y funcional del poder en la ciudad-estado." },
+            { word: "MONARQUIA", clue: "Forma pura de gobierno correspondiente al mando legítimo unipersonal." },
+            { word: "ARISTOCRACIA", clue: "Forma pura de gobierno entendida como el mandato de los mejores." },
+            { word: "OLIGARQUIA", clue: "Forma impura de gobierno, degeneración de la aristocracia." },
+            { word: "TIRANIA", clue: "Degeneración de la monarquía; ruptura fáctica del orden legal vigente (paranomia)." },
+            { word: "ESPARTA", clue: "Modelo de oligarquía militar caracterizado por su rígida búsqueda de la eunomía." },
+            { word: "ATENAS", clue: "Modelo paradigmático de democracia directa e isonomía en el mundo helénico." },
+            { word: "GRANRETRA", clue: "Constitución tradicional atribuida al ordenamiento político militar de Esparta." },
+            { word: "GERUSIA", clue: "Consejo de ancianos vitalicios en Esparta con funciones legislativas y judiciales." },
+            { word: "EFOROS", clue: "Magistrados supremos espartanos con facultades de control sobre los reyes." },
+            { word: "APELLA", clue: "Asamblea popular espartana compuesta por los ciudadanos iguales (homoioi)." },
+            { word: "BULE", clue: "Consejo de los 500 en Atenas, encargado de preparar las propuestas para la Asamblea." },
+            { word: "HELIEIA", clue: "Tribunal popular ateniense integrado por jurados con plenos poderes jurisdiccionales." },
+            { word: "EUTHYNAI", clue: "Proceso de rendición de cuentas al que se sometían las magistraturas atenienses." },
+            { word: "OSTRACISMO", clue: "Medida de seguridad política constitucional preventiva para evitar la tiranía." },
+            { word: "PSEPHISMA", clue: "Decreto coyuntural de la Asamblea ateniense subordinado al nomos." },
+            { word: "GRAFEPARANOMON", clue: "Acción pública interpuesta ante tribunales contra propuestas de leyes inconstitucionales." },
+            { word: "LOGOGRAFO", clue: "Redactor profesional de discursos judiciales para los litigantes en los tribunales atenienses." },
+            { word: "DIADIKASIA", clue: "Litigio especializado de carácter sucesorio y de legitimidad ciudadana en Atenas." },
+            { word: "ISONOMIA", clue: "Principio fundamental de igualdad jurídica y ante la ley en la democracia ateniense." },
+            { word: "ISEGORIA", clue: "Igualdad formal en el derecho al uso de la palabra dentro de la Asamblea popular." },
+            { word: "KLEROSIS", clue: "Sistema de designación a través de sorteo para ocupar cargos públicos en la democracia." },
+            { word: "IUS CIVILE", clue: "El derecho civil exclusivo de los ciudadanos romanos (quiritario)." },
+            { word: "FAS", clue: "El ordenamiento de carácter divino y voluntad de los dioses en la Roma arcaica." },
+            { word: "IUS HONORARIUM", clue: "El derecho pretorio creado para corregir la rigidez del derecho antiguo y suplir lagunas." },
+            { word: "XII TABLAS", clue: "La emblemática codificación escrita que marcó el fin del monopolio interpretativo patricio." },
+            { word: "PONTIFICES", clue: "Miembros del colegio sacerdotal que guardaban celosamente el conocimiento técnico del derecho." },
+            { word: "CERTA VERBA", clue: "Las fórmulas solemnes y rituales estricts cuya alteración provocaba la pérdida del pleito." },
+            { word: "INTERPRETATIO", clue: "La labor creadora y dogmática mediante la cual se extraían nuevas normas de textos escuetos." },
+            { word: "AEQUITAS", clue: "El principio de equidad que orientó la evolución del derecho a través de la labor del Pretor." },
+            { word: "DECEMVIRI", clue: "La comisión legislativa encargada de redactar las tablas de la ley escrita." },
+            { word: "LEGIS ACTIONES", clue: "Las antiguas acciones de la ley que regían el estricto procedimiento procesal civil." }
+        ];
+
+        let currentIndex = 0;
+        let currentWordObj = {};
+        let guessedLetters = new Set();
+        let wrongAttempts = 0;
+        const maxWrong = 6;
+        let gameActive = true;
+
+        // Mezclar aleatoriamente el léxico al iniciar para dinamizar la exposición
+        let gameLexicon = [...lexicon].sort(() => Math.random() - 0.5);
+
+        const canvas = document.getElementById("hangmanCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function initGame() {
+            if (currentIndex >= gameLexicon.length) {
+                currentIndex = 0;
+                gameLexicon = [...lexicon].sort(() => Math.random() - 0.5);
+            }
+            currentWordObj = gameLexicon[currentIndex];
+            guessedLetters.clear();
+            wrongAttempts = 0;
+            gameActive = true;
+
+            document.getElementById("current-word-idx").textContent = currentIndex + 1;
+            document.getElementById("total-words").textContent = gameLexicon.length;
+            document.getElementById("lives").textContent = maxWrong - wrongAttempts;
+            document.getElementById("clueText").textContent = `Pista: ${currentWordObj.clue}`;
+            document.getElementById("gameModal").style.display = "none";
+
+            renderWord();
+            renderKeyboard();
+            drawHangman();
+        }
+
+        function renderWord() {
+            const container = document.getElementById("wordDisplay");
+            container.innerHTML = "";
+            let solved = true;
+
+            for (let char of currentWordObj.word) {
+                const slot = document.createElement("div");
+                slot.className = "letter-slot";
+                if (guessedLetters.has(char)) {
+                    slot.textContent = char;
+                } else {
+                    slot.textContent = "";
+                    solved = false;
+                }
+                container.appendChild(slot);
+            }
+
+            if (solved && gameActive) {
+                gameActive = false;
+                triggerEndGame(true);
+            }
+        }
+
+        function renderKeyboard() {
+            const container = document.getElementById("keyboard");
+            container.innerHTML = "";
+            const alphabet = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+
+            for (let letter of alphabet) {
+                const btn = document.createElement("button");
+                btn.className = "key-btn";
+                btn.textContent = letter;
+                btn.disabled = guessedLetters.has(letter) || !gameActive;
+                btn.onclick = () => handleGuess(letter);
+                container.appendChild(btn);
+            }
+        }
+
+        function handleGuess(letter) {
+            if (!gameActive || guessedLetters.has(letter)) return;
+            guessedLetters.add(letter);
+
+            if (currentWordObj.word.includes(letter)) {
+                renderWord();
+                renderKeyboard();
+            } else {
+                wrongAttempts++;
+                document.getElementById("lives").textContent = maxWrong - wrongAttempts;
+                drawHangman();
+                renderKeyboard();
+
+                if (wrongAttempts >= maxWrong) {
+                    gameActive = false;
+                    triggerEndGame(false);
+                }
+            }
+        }
+
+        function triggerEndGame(won) {
+            const modal = document.getElementById("gameModal");
+            const title = document.getElementById("modalTitle");
+            const message = document.getElementById("modalMessage");
+            const btn = document.getElementById("modalBtn");
+
+            if (won) {
+                title.textContent = "¡Concepto Validado!";
+                title.style.color = "var(--success)";
+                message.textContent = `Has dominado correctamente el término dogmático: "${currentWordObj.word}".`;
+                btn.textContent = "Siguiente Término";
+            } else {
+                title.textContent = "Falla Dogmática";
+                title.style.color = "var(--danger)";
+                message.textContent = `El término correcto era: "${currentWordObj.word}".`;
+                btn.textContent = "Reintentar con otro concepto";
+            }
+            modal.style.display = "flex";
+        }
+
+        function nextStep() {
+            currentIndex++;
+            initGame();
+        }
+
+        // Renderizado gráfico limpio del ahorcado sobre Canvas
+        function drawHangman() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+
+            // Base de la horca
+            ctx.beginPath();
+            ctx.moveTo(20, 120);
+            ctx.lineTo(100, 120);
+            ctx.moveTo(40, 120);
+            ctx.lineTo(40, 10);
+            ctx.lineTo(100, 10);
+            ctx.lineTo(100, 30);
+            ctx.stroke();
+
+            // Partes según errores
+            if (wrongAttempts >= 1) {
+                // Cabeza
+                ctx.beginPath();
+                ctx.arc(100, 42, 12, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            if (wrongAttempts >= 2) {
+                // Tronco
+                ctx.beginPath();
+                ctx.moveTo(100, 54);
+                ctx.lineTo(100, 90);
+                ctx.stroke();
+            }
+            if (wrongAttempts >= 3) {
+                // Brazo izquierdo
+                ctx.beginPath();
+                ctx.moveTo(100, 62);
+                ctx.lineTo(80, 78);
+                ctx.stroke();
+            }
+            if (wrongAttempts >= 4) {
+                // Brazo derecho
+                ctx.beginPath();
+                ctx.moveTo(100, 62);
+                ctx.lineTo(120, 78);
+                ctx.stroke();
+            }
+            if (wrongAttempts >= 5) {
+                // Pierna izquierda
+                ctx.beginPath();
+                ctx.moveTo(100, 90);
+                ctx.lineTo(85, 112);
+                ctx.stroke();
+            }
+            if (wrongAttempts >= 6) {
+                // Pierna derecha
+                ctx.beginPath();
+                ctx.moveTo(100, 90);
+                ctx.lineTo(115, 112);
+                ctx.stroke();
+            }
+        }
+
+        // Inicializar al cargar
+        window.onload = initGame;
+    </script>
+</body>
+</html>
